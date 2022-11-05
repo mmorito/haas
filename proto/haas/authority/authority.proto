@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package mnes.haas.authority;
+
+option go_package = "github.com/mnes/haas/api/pb/haas/v1;haas";
+
+service AuthorityService {}
