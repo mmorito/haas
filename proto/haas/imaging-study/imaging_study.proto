@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package mnes.haas.imagingstudy;
-
-option go_package = "github.com/mnes/haas/api/pb/haas/v1;haas";
-
-service ImagingStudyService {}

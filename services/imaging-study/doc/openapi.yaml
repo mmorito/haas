@@ -1,0 +1,60 @@
+openapi: 3.0.1
+info:
+  title: haas/imaging-study
+  version: version not set
+servers:
+- url: /
+tags:
+- name: ImagingStudyService
+paths:
+  /v1/organizations/{organizationID}/studies:
+    post:
+      tags:
+      - ImagingStudyService
+      summary: 検査画像アップロード(STOW-RS)
+      operationId: ImagingStudyService_StoreInstances
+      parameters:
+      - name: organizationID
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/related; type=application/dicom:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        200:
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/organizations/{organizationID}/studies/{studyInstanceUID}:
+    get:
+      tags:
+      - ImagingStudyService
+      summary: 結果画像ダウンロード(WADO-RS)
+      operationId: ImagingStudyService_RetrieveStudy
+      parameters:
+      - name: organizationID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: studyInstanceUID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: A successful response.
+          content:
+            multipart/related; type=application/dicom;:
+              schema:
+                type: string
+                format: binary
