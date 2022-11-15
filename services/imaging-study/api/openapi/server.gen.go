@@ -13,12 +13,12 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// 検査画像アップロード(STOW-RS)
+	// Store Instances (STOW-RS)
 	// (POST /v1/organizations/{organizationID}/studies)
-	ImagingStudyServiceStoreInstances(ctx echo.Context, organizationID string) error
-	// 結果画像ダウンロード(WADO-RS)
+	StoreInstances(ctx echo.Context, organizationID string) error
+	// Retrieve Study (WADO-RS)
 	// (GET /v1/organizations/{organizationID}/studies/{studyInstanceUID})
-	ImagingStudyServiceRetrieveStudy(ctx echo.Context, organizationID string, studyInstanceUID string) error
+	RetrieveStudy(ctx echo.Context, organizationID string, studyInstanceUID string) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -26,8 +26,8 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// ImagingStudyServiceStoreInstances converts echo context to params.
-func (w *ServerInterfaceWrapper) ImagingStudyServiceStoreInstances(ctx echo.Context) error {
+// StoreInstances converts echo context to params.
+func (w *ServerInterfaceWrapper) StoreInstances(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "organizationID" -------------
 	var organizationID string
@@ -38,12 +38,12 @@ func (w *ServerInterfaceWrapper) ImagingStudyServiceStoreInstances(ctx echo.Cont
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ImagingStudyServiceStoreInstances(ctx, organizationID)
+	err = w.Handler.StoreInstances(ctx, organizationID)
 	return err
 }
 
-// ImagingStudyServiceRetrieveStudy converts echo context to params.
-func (w *ServerInterfaceWrapper) ImagingStudyServiceRetrieveStudy(ctx echo.Context) error {
+// RetrieveStudy converts echo context to params.
+func (w *ServerInterfaceWrapper) RetrieveStudy(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "organizationID" -------------
 	var organizationID string
@@ -62,7 +62,7 @@ func (w *ServerInterfaceWrapper) ImagingStudyServiceRetrieveStudy(ctx echo.Conte
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ImagingStudyServiceRetrieveStudy(ctx, organizationID, studyInstanceUID)
+	err = w.Handler.RetrieveStudy(ctx, organizationID, studyInstanceUID)
 	return err
 }
 
@@ -94,7 +94,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.POST(baseURL+"/v1/organizations/:organizationID/studies", wrapper.ImagingStudyServiceStoreInstances)
-	router.GET(baseURL+"/v1/organizations/:organizationID/studies/:studyInstanceUID", wrapper.ImagingStudyServiceRetrieveStudy)
+	router.POST(baseURL+"/v1/organizations/:organizationID/studies", wrapper.StoreInstances)
+	router.GET(baseURL+"/v1/organizations/:organizationID/studies/:studyInstanceUID", wrapper.RetrieveStudy)
 
 }

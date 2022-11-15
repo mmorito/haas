@@ -11,8 +11,10 @@ paths:
     post:
       tags:
       - ImagingStudyService
-      summary: 検査画像アップロード(STOW-RS)
-      operationId: ImagingStudyService_StoreInstances
+      summary: Store Instances (STOW-RS)
+      description:
+        Store Instances API stores DICOM instances associated with study instance unique identifiers (SUID).
+      operationId: StoreInstances
       parameters:
       - name: organizationID
         in: path
@@ -37,8 +39,10 @@ paths:
     get:
       tags:
       - ImagingStudyService
-      summary: 結果画像ダウンロード(WADO-RS)
-      operationId: ImagingStudyService_RetrieveStudy
+      summary: Retrieve Study (WADO-RS)
+      description:
+        Retrieve Study API returns all instances within the given study.
+      operationId: RetrieveStudy
       parameters:
       - name: organizationID
         in: path

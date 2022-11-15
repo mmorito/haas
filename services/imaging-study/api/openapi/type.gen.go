@@ -7,8 +7,8 @@ import (
 	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 )
 
-// ImagingStudyServiceStoreInstancesMultipartBody defines parameters for ImagingStudyServiceStoreInstances.
-type ImagingStudyServiceStoreInstancesMultipartBody = openapi_types.File
+// StoreInstancesMultipartBody defines parameters for StoreInstances.
+type StoreInstancesMultipartBody = openapi_types.File
 
-// ImagingStudyServiceStoreInstancesMultipartRequestBody defines body for ImagingStudyServiceStoreInstances for multipart/related; type=application/dicom ContentType.
-type ImagingStudyServiceStoreInstancesMultipartRequestBody = ImagingStudyServiceStoreInstancesMultipartBody
+// StoreInstancesMultipartRequestBody defines body for StoreInstances for multipart/related; type=application/dicom ContentType.
+type StoreInstancesMultipartRequestBody = StoreInstancesMultipartBody
