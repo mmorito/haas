@@ -2,9 +2,6 @@ package config
 
 import (
 	"log"
-	"strings"
-
-	"cloud.google.com/go/compute/metadata"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -13,13 +10,12 @@ import (
 
 type env struct {
 	// App
-	Host        string `envconfig:"APP_HOST"`
 	Port        string `envconfig:"PORT" default:"8080"`
 	Environment string `envconfig:"ENVIRONMENT" default:"local"` // local | ci | staging | production
 
 	// GCP
-	ProjectID      string `envconfig:"GCLOUD_PROJECT" default:"mnes-peugeot"`
-	Region         string `envconfig:"GCP_REGION" default:"asia-northeast1"`
+	ProjectID      string `envconfig:"PROJECT_ID" default:"mnes-sandbox-morito"`
+	Location       string `envconfig:"LOCATION" default:"asia-northeast1"`
 	ServiceAccount string `envconfig:"SERVICE_ACCOUNT"`
 
 	// PostgreSQL
@@ -39,25 +35,6 @@ func SetEnv() {
 	if err != nil {
 		log.Fatalf("failed to read env: %v", err)
 	}
-
-	if e.Environment != "local" {
-		// YFI: Metadata server: https://cloud.google.com/run/docs/container-contract#metadata-server
-
-		// Set ProjectID
-		projectID, err := metadata.ProjectID()
-		if err != nil {
-			log.Fatalf("failed to get ProjectID from Metadata server: %v", err)
-		}
-		e.ProjectID = projectID
-
-		// Set Region
-		regionPath, err := metadata.Get("instance/region") // returns projects/PROJECT-NUMBER/regions/REGION
-		if err != nil {
-			log.Fatalf("failed to get Region from Metadata server: %v", err)
-		}
-		e.Region = strings.Split(regionPath, "regions/")[1]
-	}
-
 }
 
 // Env はenvを取得する

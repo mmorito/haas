@@ -1,15 +1,23 @@
 package server
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-func (*server) StoreInstances(ctx echo.Context, organizationID string) error {
-	return ctx.JSON(http.StatusOK, organizationID)
+func (s *server) StoreInstances(ctx echo.Context, organizationID string) error {
+	fmt.Printf("start StoreInstances")
+	f, _ := io.ReadAll(ctx.Request().Body)
+	// fmt.Printf("%s", f)
+
+	// return ctx.JSON(http.StatusOK, organizationID)
+
+	return s.dicomwebUsecase.StoreInstance(f, "mmorito", "mmorito", "stidies")
 }
 
-func (*server) RetrieveStudy(ctx echo.Context, organizationID string, studyInstanceUID string) error {
+func (s *server) RetrieveStudy(ctx echo.Context, organizationID string, studyInstanceUID string) error {
 	return ctx.JSON(http.StatusOK, studyInstanceUID)
 }

@@ -23,7 +23,7 @@ paths:
           type: string
       requestBody:
         content:
-          multipart/related; type=application/dicom:
+          application/dicom:
             schema:
               type: string
               format: binary

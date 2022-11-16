@@ -8,14 +8,12 @@ import (
 	"time"
 
 	"github.com/brpaz/echozap"
-	openapimiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/mnes/haas/services/imaging-study/openapi"
 	"github.com/mnes/haas/services/imaging-study/src/config"
 )
 
@@ -31,15 +29,15 @@ func (s *server) setConfig() {
 	s.echo.HideBanner = true
 	s.echo.HidePort = true
 
-	swagger, err := openapi.GetSwagger()
-	if err != nil {
-		log.Fatalf("GetSwagger failed: %v", err)
-	}
-	swagger.Servers = nil
+	// swagger, err := openapi.GetSwagger()
+	// if err != nil {
+	// 	log.Fatalf("GetSwagger failed: %v", err)
+	// }
+	// swagger.Servers = nil
 
 	s.echo.Use(echozap.ZapLogger(zapLogger()))
 	s.echo.Use(middleware.Recover())
-	s.echo.Use(openapimiddleware.OapiRequestValidator(swagger))
+	// s.echo.Use(openapimiddleware.OapiRequestValidator(swagger))
 }
 
 func (s *server) start() {
