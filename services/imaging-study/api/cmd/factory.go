@@ -5,16 +5,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"time"
 
-	"github.com/brpaz/echozap"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/mnes/haas/services/imaging-study/src/config"
+	"github.com/mnes/haas/services/imaging-study/src/logger"
 )
 
 type server struct {
@@ -34,10 +32,10 @@ func (s *server) setConfig() {
 	// 	log.Fatalf("GetSwagger failed: %v", err)
 	// }
 	// swagger.Servers = nil
-
-	s.echo.Use(echozap.ZapLogger(zapLogger()))
-	s.echo.Use(middleware.Recover())
 	// s.echo.Use(openapimiddleware.OapiRequestValidator(swagger))
+
+	s.echo.Use(logger.ExtractRequestField(logger.ZapLogger()))
+	s.echo.Use(middleware.Recover())
 }
 
 func (s *server) start() {
@@ -59,28 +57,4 @@ func (s *server) gracefulStop() {
 		log.Fatal(err)
 	}
 	zap.L().Info("Server exiting")
-}
-
-func zapLogger() *zap.Logger {
-	loggerConfig := zap.NewProductionConfig()
-	loggerConfig.EncoderConfig.TimeKey = "time"
-	loggerConfig.EncoderConfig.EncodeTime = jstTimeEncoder
-	loggerConfig.EncoderConfig.LevelKey = "severity"
-	loggerConfig.EncoderConfig.StacktraceKey = "stack_trace"
-	loggerConfig.EncoderConfig.NameKey = "logger"
-
-	zapLogger, err := loggerConfig.Build()
-	if err != nil {
-		log.Fatalf("logger failed: %v", err)
-	}
-
-	zap.ReplaceGlobals(zapLogger)
-
-	return zapLogger
-}
-
-func jstTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	const layout = "2006-01-02T15:04:05+09:00"
-	jst := time.FixedZone("Asia/Tokyo", 9*60*60)
-	enc.AppendString(t.In(jst).Format(layout))
 }
