@@ -14,4 +14,4 @@ docker/proto/fmt: ## Build a docker image to run the proto file format
 
 .PHONY: docker/proto/protoc
 docker/proto/protoc: ## Build a docker image to generate interfaces
-	@docker build --platform=linux/x86_64 -t $(MODULE_NAME)/protoc -f docker/protoc.Dockerfile . --no-cache
+	@docker build --platform=linux/x86_64 -t $(MODULE_NAME)/protoc -f docker/protoc.Dockerfile .
