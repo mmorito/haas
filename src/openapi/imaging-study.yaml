@@ -1,0 +1,101 @@
+openapi: 3.0.1
+info:
+  title: haas/imaging-study
+  version: version not set
+servers:
+- url: /
+tags:
+- name: ImagingStudyService
+paths:
+  /v1/organizations/{organizationID}/dicomStore:
+    post:
+      tags:
+      - ImagingStudyService
+      summary: Create new DicomStore
+      description:
+        Create DicomStore API creates a new DICOM store within the parent dataset.
+      operationId: CreateDicomStore
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasetID:
+                  type: string
+                dicomStoreID:
+                  type: string
+              required:
+                - datasetID
+                - dicomStoreID
+      responses:
+        200:
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+
+  /v1/organizations/{organizationID}/studies:
+    post:
+      tags:
+      - ImagingStudyService
+      summary: Store Instances (STOW-RS)
+      description:
+        Store Instances API stores DICOM instances associated with study instance unique identifiers (SUID).
+      operationId: StoreInstances
+      parameters:
+      - name: organizationID
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/dicom:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        200:
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/organizations/{organizationID}/studies/{studyInstanceUID}:
+    get:
+      tags:
+      - ImagingStudyService
+      summary: Retrieve Study (WADO-RS)
+      description:
+        Retrieve Study API returns all instances within the given study.
+      operationId: RetrieveStudy
+      parameters:
+      - name: organizationID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: studyInstanceUID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: A successful response.
+          content:
+            multipart/related; type=application/dicom;:
+              schema:
+                type: string
+                format: binary
