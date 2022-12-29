@@ -1,20 +1,24 @@
 openapi: 3.0.1
 info:
-  title: haas/imaging-study
+  title: Imaging-Study API Reference
+  description: |
+    LOOKREC Andromeda - Imaging-Study APIは、RESTを中心に構成されています。
   version: version not set
 servers:
-- url: /
-tags:
-- name: ImagingStudyService
+- url: http://localhost:8080
+  description: ローカル開発用
+- url: https://andromeda.lookrec.com
+  description: 本番サーバー
 paths:
-  /v1/organizations/{organizationID}/dicomStore:
+# Datasets - データセット
+  /v1/organizations/{organizationID}/dataset:
     post:
       tags:
-      - ImagingStudyService
-      summary: Create new DicomStore
-      description:
-        Create DicomStore API creates a new DICOM store within the parent dataset.
-      operationId: CreateDicomStore
+      - Datasets - データセット
+      summary: Create a new Dataset
+      description: |
+        組織内に医療データを保管するためのデータセットを作成することができます。  
+        DICOMStoreを作成するためには、先にデータセットを作成する必要があります。
       parameters:
         - name: organizationID
           in: path
@@ -26,32 +30,150 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                datasetID:
-                  type: string
-                dicomStoreID:
-                  type: string
-              required:
-                - datasetID
-                - dicomStoreID
+              $ref: '#/components/schemas/create_dataset_request'
       responses:
         200:
           description: A successful response.
           content:
             application/json:
               schema:
-                type: object
-                properties:
+                $ref: '#/components/schemas/create_dataset_response'
+  
+  /v1/organizations/{organizationID}/datasets:
+    get:
+      tags:
+      - Datasets - データセット
+      summary: Returns a list of your Datasets.
+      description: |
+        組織内に作成済みデータセットのリストを取得します
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list_dataset_response'
+  
+  /v1/organizations/{organizationID}/datasets/{datasetID}:
+    delete:
+      tags:
+      - Datasets - データセット
+      summary: Delete the Dataset with the given ID.
+      description: |
+        組織内に作成済みデータセットを削除することができます。  
+        データセットに紐付くDICOMStoreがある場合はそちらも削除されます
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: datasetID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: The resource was deleted successfully.
 
+# DICOMStore - DICOMストア
+  /v1/organizations/{organizationID}/dicomStore:
+    post:
+      tags:
+      - DICOMStore - DICOMストア
+      summary: Create a DicomStore
+      description: |
+        組織内のデータセット内DICOMStoreを作成します
+        検査画像を保管するためには、先にDICOMStoreを作成する必要があります。
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_dicomstore_request'
+      responses:
+        200:
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create_dicomstore_response'
+  
+  /v1/organizations/{organizationID}/datasets/{datasetID}/dicomStores:
+    get:
+      tags:
+      - DICOMStore - DICOMストア
+      summary: Returns a list of your DICOMStores.
+      description: |
+        組織内のデータセット内に作成済みDICOMStoreのリストを取得します
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: datasetID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/list_dicomstore_response'
+  
+  /v1/organizations/{organizationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}:
+    delete:
+      tags:
+      - DICOMStore - DICOMストア
+      summary: Delete the Dataset with the given ID.
+      description: |
+        組織内のデータセット内に作成済みDICOMStoreを削除することができます。  
+        DICOMStoreに検査画像が保管されている場合はすべて削除されます
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: datasetID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: dicomStoreID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: The resource was deleted successfully.
+
+# ImagingStudies - 検査画像(DICOM)
   /v1/organizations/{organizationID}/studies:
     post:
       tags:
-      - ImagingStudyService
+      - ImagingStudies - 検査画像(DICOM)
       summary: Store Instances (STOW-RS)
-      description:
-        Store Instances API stores DICOM instances associated with study instance unique identifiers (SUID).
-      operationId: StoreInstances
+      description: |
+        1件以上のDICOM画像をStudyInstanceUIDに基づいて保管することができます
       parameters:
       - name: organizationID
         in: path
@@ -62,8 +184,7 @@ paths:
         content:
           application/dicom:
             schema:
-              type: string
-              format: binary
+              $ref: '#/components/schemas/store_instances_request'
         required: true
       responses:
         200:
@@ -71,14 +192,15 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/store_instances_response'
+
   /v1/organizations/{organizationID}/studies/{studyInstanceUID}:
     get:
       tags:
-      - ImagingStudyService
+      - ImagingStudies - 検査画像(DICOM)
       summary: Retrieve Study (WADO-RS)
-      description:
-        Retrieve Study API returns all instances within the given study.
+      description: |
+        StudyInstanceUIDに基づいてすべてのDICOM画像を取得することができます
       operationId: RetrieveStudy
       parameters:
       - name: organizationID
@@ -97,5 +219,74 @@ paths:
           content:
             multipart/related; type=application/dicom;:
               schema:
-                type: string
-                format: binary
+                $ref: '#/components/schemas/retrieve_study_response'
+
+components:
+  schemas:
+    create_dataset_request:
+      type: object
+      properties:
+        datasetID:
+          type: string
+    
+    create_dataset_response:
+      type: object
+      properties:
+        organizationID:
+          type: string
+        datasetID:
+          type: string
+    
+    list_dataset_response:
+      type: array
+      items:
+        type: object
+        properties:
+          organizationID:
+            type: string
+          datasetID:
+            type: string
+      
+    create_dicomstore_request:
+      type: object
+      properties:
+        datasetID:
+          type: string
+        dicomStoreID:
+          type: string
+      required:
+        - datasetID
+        - dicomStoreID
+    
+    create_dicomstore_response:
+      type: object
+      properties:
+        organizationID:
+          type: string
+        datasetID:
+          type: string
+        dicomStoreID:
+          type: string
+
+    list_dicomstore_response:
+      type: array
+      items:
+        type: object
+        properties:
+          organizationID:
+            type: string
+          datasetID:
+            type: string
+          dicomStoreID:
+            type: string
+    
+    store_instances_request:
+      type: string
+      format: binary
+      
+    store_instances_response:
+      type: object
+    
+    retrieve_study_response:
+      type: string
+      format: binary
